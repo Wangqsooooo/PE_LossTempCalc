@@ -54,7 +54,11 @@ classdef TopologyType
                     if select == 1
                         result = isisomorphic(Gs, G);
                     else
+                        % I代表输入拓扑节点图G与标准拓扑节点图之间对应关系
+                        % I = [2 1] 说明输入图G的节点2对应着标准图的节点1
+                        %                       节点1对应着标准图的节点2
                         I = isomorphism(Gs, G);
+                        % 共两行, I(1) I(2)节点连接的是标准拓扑中1号开关器件
                         result = [I(1) I(2); I(2) I(3)];
                     end
                 case TopologyType.ThreeLevel_ANPC
@@ -64,6 +68,7 @@ classdef TopologyType
                         result = isisomorphic(Gs, G);
                     else
                         I = isomorphism(Gs, G);
+                        % 共六行, 三电平ANPC电路共六个开关器件
                         result = [I(1) I(2); I(2) I(6); I(6) I(4); ...
                             I(4) I(5); I(2) I(3); I(3) I(4)];
                     end
