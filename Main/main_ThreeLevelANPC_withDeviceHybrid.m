@@ -1,0 +1,27 @@
+% 存在器件层面上的混合情况, 此时并联的器件并不是一样的, 其驱动信号也有可能不一样
+% 为了实现对器件层面混合场合下的计算, 导致源代码多处进行了修改, 这会导致源码难以看懂
+filename = 'ThreeLevel_ANPC_withDeviceHybrid.txt';
+topology = Topology('Filename', filename);
+Vdc = topology.Path(end, end-1)-topology.Path(1, end-1); % Vdc等于逆变器输出侧最高直流电压减去最低直流电压
+cload = Load(Vdc, 4000, 0.02, 1e-3, 400, 100e3, 100, 1, 'PF', 0.9524); % load是matlab的关键词, 换成cload
+waves = Waves(cload, topology.Nums, 0.06);
+waves.ThreeLevel_ANPC_SingleCurrentPath(cload, 0, [1 2 3 4 5 6]);
+waves.Control(7:8, :) = waves.Control(2:3, :);
+waves.notify('ControlChanged'); % 由于是自己配置了一部分控制信号(7号和8号开关器件的信号)
+                                % 因此需要发出一个通知
+waves.ShortCircuit_Check(topology.HB_Restriction);
+waves.Output_Waves_Calc(topology.Path, cload);
+% h = figure(1);
+% h = waves.Output_Waves_Display(h);
+SiC_MOSFET = load('.\devices\Cree_C3M0015065K_SiC_650V.mat');
+Si_IGBT = load('.\devices\Infineon_IKZ75N65EL5_650V_withoutRecovery.mat');
+devices = [Si_IGBT.device SiC_MOSFET.device SiC_MOSFET.device Si_IGBT.device ...
+    Si_IGBT.device Si_IGBT.device Si_IGBT.device Si_IGBT.device];
+parallel_nums = [3 3 3 3 3 3 2 2]; % 3 .* ones(1, topology.Nums); % 器件并联个数
+Switching_Voltage = Vdc./2 .* ones(1, topology.Nums);
+losses = Losses(waves.T, waves.Ts, waves.OneCycleCurrent, waves.OneCycleControl, ...
+    topology.Path, devices, parallel_nums, Switching_Voltage, topology.Device_InParallel);
+% losses.Temperature_Losses_Calc(0.1);
+losses.JunctionTemperatureSet(25);
+losses.Conduction_Losses_Calc();
+losses.Switching_Losses_Calc();
