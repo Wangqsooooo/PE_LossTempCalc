@@ -1,6 +1,6 @@
 *.asv
+*.slxc
 /*.m
-/*.slxc
 /*mlx
 /devices/Datasheet_images/
 /example/
