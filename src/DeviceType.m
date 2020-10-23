@@ -1,6 +1,7 @@
 classdef DeviceType
     enumeration
         IGBT
+        IGBTwithoutDiode
         MOSFET
         CoolMOS
     end
@@ -11,6 +12,17 @@ classdef DeviceType
                 case DeviceType.IGBT
                     temp.type = 'exponential'; % 导通压降与流过的电流是指数关系
                     fittype.Forward = temp; fittype.Reverse = temp;
+                    temp.type = 'linear'; fittype.Recovery = temp;
+                    temp.type = 'Standard'; % 开关损耗采用的是统一的模型
+                    % E_vs_V E_vs_Tj要么是多项式的形式, 即polyn, 其中n为多项式的最高次幂指数
+                    % 要么是a*x^b形式, 对于E_vs_V这表示实际切换电压下产生的开关损耗是基准电压Vbase下的V(V/Vbase)^b倍
+                    temp.E_vs_I = 'poly2'; temp.E_vs_V = 'a*x^b'; temp.E_vs_Tj = 'poly2'; temp.E_vs_Rg = 'poly2';
+                    fittype.Switch_Eon = temp; fittype.Switch_Eoff = temp;
+                case DeviceType.IGBTwithoutDiode
+                    temp.type = 'exponential'; % 导通压降与流过的电流是指数关系
+                    fittype.Forward = temp;
+                    temp.type = 'none'; % 没有反并联二极管的IGBT无法反向续流
+                    fittype.Reverse = temp;
                     temp.type = 'linear'; fittype.Recovery = temp;
                     temp.type = 'Standard'; % 开关损耗采用的是统一的模型
                     % E_vs_V E_vs_Tj要么是多项式的形式, 即polyn, 其中n为多项式的最高次幂指数
@@ -45,6 +57,14 @@ classdef DeviceType
                 case DeviceType.IGBT
                     if strcmp(state, 'Forward') || strcmp(state, 'Reverse')
                         axes_list = {'I_vs_V'};
+                    else
+                        axes_list = {'E_vs_I', 'E_vs_Tj', 'E_vs_V', 'E_vs_Rg'};
+                    end
+                case DeviceType.IGBTwithoutDiode
+                    if strcmp(state, 'Forward')
+                        axes_list = {'I_vs_V'};
+                    elseif strcmp(state, 'Reverse')
+                        axes_list = {''};
                     else
                         axes_list = {'E_vs_I', 'E_vs_Tj', 'E_vs_V', 'E_vs_Rg'};
                     end

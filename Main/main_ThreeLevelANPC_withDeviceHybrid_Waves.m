@@ -29,7 +29,7 @@ SiC_MOSFET = load('.\devices\Cree_C3M0015065K_SiC_650V.mat');
 Si_IGBT = load('.\devices\Infineon_IKZ75N65EL5_650V_withoutRecovery.mat');
 devices = [Si_IGBT.device SiC_MOSFET.device SiC_MOSFET.device Si_IGBT.device ...
     Si_IGBT.device Si_IGBT.device Si_IGBT.device Si_IGBT.device];
-parallel_nums = [3 3 3 3 3 3 3 3]; % 3 .* ones(1, topology.Nums); % 器件并联个数
+parallel_nums = [3 3 3 3 3 3 2 2]; % 3 .* ones(1, topology.Nums); % 器件并联个数
 Switching_Voltage = Vdc./2 .* ones(1, topology.Nums);
 losses = Losses(waves.T, waves.Ts, waves.OneCycleCurrent, waves.OneCycleControl, ...
     topology.Path, devices, parallel_nums, Switching_Voltage, topology.Device_InParallel);
@@ -45,4 +45,6 @@ current7 = waves.Device_FlowingCurrent_Calc(7, losses.Path, losses.Device_InPara
 current7 = current7(round((waves.Period-waves.T)/waves.Ts+1):round(waves.Period/waves.Ts+1));
 t = 0:waves.Ts:waves.T;
 figure(2); hold on;
-plot(t, current2); plot(t, current7);
+plot(t, current2, 'LineWidth', 1.0, 'DisplayName', 'SiC MOSFET'); 
+plot(t, current7, 'LineWidth', 1.0, 'DisplayName', 'Si IGBT');
+legend;

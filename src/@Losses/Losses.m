@@ -120,14 +120,14 @@ classdef Losses < handle
         end
         % 计算器件层面混合情况下各并联器件的电流分配情况
         function Current_Coefficient_Calc(obj)
-            max_current = max(obj.Current); sample_nums = 200; % 设置为偶数
+            max_current = max(obj.Current); sample_nums = 201; % 需要设置为奇数
             obj.Device_InParallel_Coefficient = containers.Map;
             for i = 1:size(obj.Device_InParallel,1)
                 position = find(obj.Device_InParallel(i, :)~=0);
                 if ~isempty(position)
                     current_range = linspace(-max_current/(length(position)+1), max_current/(length(position)+1), sample_nums);
-                    reci_range = 1 ./ current_range;
-                    record1 = zeros(length(position)+1, length(current_range));
+                    reci_range = 1 ./ current_range; reci_range(reci_range==Inf) = 0;
+                    record1 = zeros(length(position)+1, sample_nums);
                     record2 = record1;
                     [record1(1, :), record2(1, :)] = obj.Devices(i).Conduction_Loss(current_range...
                         ./obj.Parallel_Nums(i), obj.Tj{i});
@@ -146,14 +146,28 @@ classdef Losses < handle
                         record1(j+1, :) = record1(j+1, :) .* reci_range .* obj.Parallel_Nums(position(j));
                         record2(j+1, :) = record2(j+1, :) .* reci_range .* obj.Parallel_Nums(position(j));
                     end
+                    
                     voltage_range1 = max(max(record1, [], 2));
                     voltage_range2 = min(min(record2, [], 2));
-                    F = griddedInterpolant(record1(1,:)+record2(1,:), current_range);
-                    current = F(linspace(voltage_range2,voltage_range1,sample_nums));
-                    sum_current = current;
-                    for j = 1:length(position)
-                        F = griddedInterpolant(record1(j+1,:)+record2(j+1,:), current_range);
-                        sum_current = sum_current + F(linspace(voltage_range2,voltage_range1,sample_nums));
+                    voltage_range = linspace(voltage_range2, voltage_range1, sample_nums);
+                    sum_current = zeros(1, sample_nums); j = 1;
+                    while j <= length(position)+1
+                        if ~any(record2(j, :)) % record2(j, :)全部等于0的情况, 该情况即为不带反并联Diode的IGBT的情况
+                            F = griddedInterpolant(record1(j, fix(sample_nums/2+1):sample_nums), ...
+                                current_range(fix(sample_nums/2+1):sample_nums));
+                            sum_current = sum_current + F(voltage_range.*(voltage_range>=0));
+                        elseif ~any(record1(j, :)) % record1(j, :)全部等于0的情况, 该情况即为IGBT不带反并联Diode且反向并联的情况
+                            F = griddedInterpolant(record2(j, 1:fix(sample_nums/2+1)), ...
+                                current_range(1:fix(sample_nums/2+1)));
+                            sum_current = sum_current + F(voltage_range.*(voltage_range<0));
+                        else
+                            F = griddedInterpolant(record1(j,:)+record2(j,:), current_range);
+                            sum_current = sum_current + F(voltage_range);
+                        end
+                        if j == 1
+                            current = sum_current;
+                        end
+                        j = j + 1;
                     end
                     F = griddedInterpolant(sum_current, current./sum_current);
                     obj.Device_InParallel_Coefficient(num2str([i, position])) = F;

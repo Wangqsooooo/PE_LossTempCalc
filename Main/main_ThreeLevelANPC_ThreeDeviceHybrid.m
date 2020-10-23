@@ -1,6 +1,8 @@
-% 存在器件层面上的混合情况, 此时并联的器件并不是一样的, 其驱动信号也有可能不一样
-% 为了实现对器件层面混合场合下的计算, 导致源代码多处进行了修改, 这会导致源码难以看懂
-filename = 'ThreeLevel_ANPC_withDeviceHybrid.txt';
+% 三种器件的混合并联, 目的是为了SiC MOSFET + Si IGBT + SiC Diode混合并联用的
+% 经过测试原来的程序可以直接使用
+% 一个测试中将3 * SiC + 1 * Si + 1 * Si计算结果与 3 * SiC + 2 * Si计算结果进行比较
+% 结果是完全一致的, 说明原来的程序是可以直接使用的
+filename = 'ThreeLevel_ANPC_ThreeDeviceHybrid.txt';
 topology = Topology('Filename', filename);
 Vdc = topology.Path(end, end-1)-topology.Path(1, end-1); % Vdc等于逆变器输出侧最高直流电压减去最低直流电压
 cload = Load(Vdc, 4000, 0.02, 1e-3, 400, 100e3, 100, 1, 'PF', 0.9524); % load是matlab的关键词, 换成cload
@@ -13,11 +15,13 @@ shift1(end) = waves.Control(2, end-round(delay/waves.Ts));
 shift2(1:end-1) = circshift(waves.Control(2, 1:end-1), -round(delay/waves.Ts));
 shift2(end) = waves.Control(2, 1+round(delay/waves.Ts));
 waves.Control(7, :) = waves.Control(2, :)>0.5 & shift2>0.5;
+waves.Control(8, :) = waves.Control(7, :);
 shift1(1:end-1) = circshift(waves.Control(3, 1:end-1), round(delay/waves.Ts));
 shift1(end) = waves.Control(3, end-round(delay/waves.Ts));
 shift2(1:end-1) = circshift(waves.Control(3, 1:end-1), -round(delay/waves.Ts));
 shift2(end) = waves.Control(3, 1+round(delay/waves.Ts));
-waves.Control(8, :) = waves.Control(3, :)>0.5 & shift2>0.5;
+waves.Control(9, :) = waves.Control(3, :)>0.5 & shift2>0.5;
+waves.Control(10, :) = waves.Control(9, :);
 waves.notify('ControlChanged'); % 由于是自己配置了一部分控制信号(7号和8号开关器件的信号)
                                 % 因此需要发出一个通知
 waves.ShortCircuit_Check(topology.HB_Restriction);
@@ -25,10 +29,12 @@ waves.Output_Waves_Calc(topology.Path, cload);
 % h = figure(2);
 % h = waves.Output_Waves_Display(h);
 SiC_MOSFET = load('.\devices\Cree_C3M0015065K_SiC_650V.mat');
-Si_IGBT = load('.\devices\Copy_of_Infineon_IKZ75N65EL5_650V_withoutRecovery.mat');
+Si_IGBT = load('.\devices\Infineon_IKZ75N65EL5_650V_withoutRecovery.mat');
+Si_IGBTwithoutDiode = load('.\devices\Copy_of_Infineon_IKZ75N65EL5_650V_withoutRecovery.mat');
 devices = [Si_IGBT.device SiC_MOSFET.device SiC_MOSFET.device Si_IGBT.device ...
-    Si_IGBT.device Si_IGBT.device Si_IGBT.device Si_IGBT.device];
-parallel_nums = [3 3 3 3 3 3 2 2]; % 3 .* ones(1, topology.Nums); % 器件并联个数
+    Si_IGBT.device Si_IGBT.device Si_IGBT.device Si_IGBT.device ...
+    Si_IGBTwithoutDiode.device Si_IGBTwithoutDiode.device];
+parallel_nums = [3 3 3 3 3 3 1 1 1 1]; % 3 .* ones(1, topology.Nums); % 器件并联个数
 Switching_Voltage = Vdc./2 .* ones(1, topology.Nums);
 losses = Losses(waves.T, waves.Ts, waves.OneCycleCurrent, waves.OneCycleControl, ...
     topology.Path, devices, parallel_nums, Switching_Voltage, topology.Device_InParallel);

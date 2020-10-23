@@ -1,5 +1,15 @@
 function Conduction_Params_Extraction(obj, fieldname)
-[data, text] = xlsread(obj.Filename, fieldname);
+try
+    [data, text] = xlsread(obj.Filename, fieldname);
+catch ME
+    if strcmp(ME.identifier, 'MATLAB:xlsread:WorksheetNotFound')
+        warning('The excel file don''t have %s part.', fieldname);
+        obj.Conduction.(fieldname) = {0};
+        return;
+    else
+        rethrow(ME);
+    end
+end
 switch obj.Fittype.(fieldname).type 
     case 'exponential'
         obj.Conduction.(fieldname) = Exponential_Fit(data, text);
@@ -9,6 +19,8 @@ switch obj.Fittype.(fieldname).type
         else
             obj.Conduction.(fieldname) = Linear_Fit_Reverse(data, text);
         end
+    case 'none'
+        obj.Conduction.(fieldname) = {0};
 end
 end
 

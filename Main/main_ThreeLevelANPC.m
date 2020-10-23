@@ -10,12 +10,13 @@ waves.Output_Waves_Calc(topology.Path, cload);
 % h = waves.Output_Waves_Display(h);
 SiC_MOSFET = load('.\devices\Cree_C3M0015065K_SiC_650V.mat');
 Si_IGBT = load('.\devices\Infineon_IKZ75N65EL5_650V_withoutRecovery.mat');
+
 devices = [Si_IGBT.device SiC_MOSFET.device SiC_MOSFET.device Si_IGBT.device Si_IGBT.device Si_IGBT.device];
 parallel_nums = [3 3 3 3 3 3]; % 3 .* ones(1, topology.Nums); % 器件并联个数
 Switching_Voltage = Vdc./2 .* ones(1, topology.Nums);
 losses = Losses(waves.T, waves.Ts, waves.OneCycleCurrent, waves.OneCycleControl, ...
     topology.Path, devices, parallel_nums, Switching_Voltage);
 % losses.Temperature_Losses_Calc(0.1);
-losses.JunctionTemperatureSet(25);
+losses.JunctionTemperatureSet(85);
 losses.Conduction_Losses_Calc();
 losses.Switching_Losses_Calc();

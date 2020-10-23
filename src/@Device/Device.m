@@ -165,19 +165,23 @@ classdef Device < handle
                     voltage = polyval(obj.Conduction.Forward{2}, Tj) ...
                         + polyval(obj.Conduction.Forward{3}, Tj) ...
                         .* current .^ obj.Conduction.Forward{4};
-                else
+                elseif obj.Conduction.Forward{1} == 1
                     Ron = polyval(obj.Conduction.Forward{2}, Tj/obj.Conduction.Tjbase) ...
                         .* obj.Conduction.Forward{3}(current);
                     voltage = Ron' .* current;
+                else
+                    voltage = zeros(size(current));
                 end
             else
                 if obj.Conduction.Reverse{1} == 2
                     voltage = polyval(obj.Conduction.Reverse{2}, Tj) ...
                         + polyval(obj.Conduction.Reverse{3}, Tj) ...
                         .* current .^ obj.Conduction.Reverse{4};
-                else
+                elseif obj.Conduction.Reverse{1} == 1
                     Ron = obj.Conduction.Reverse{2}(Tj);
                     voltage = Ron' .* current;
+                else
+                    voltage = zeros(size(current));
                 end
             end
             voltage(voltage<0) = 0; % 最小电压电压限制
