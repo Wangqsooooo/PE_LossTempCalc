@@ -14,10 +14,17 @@ if ~isfile(fullfile(pathstr, strcat(name, matext)))
     save(fullfile(pathstr, name), 'device');
 end
 % Infineon IGBT without Diode
-path = '.\devices\Copy_of_Infineon_IKZ75N65EL5_650V_withoutRecovery.xlsx';
+path = '.\devices\Infineon_IGZ100N65H5_650V.xlsx';
 [pathstr, name, ~] = fileparts(path);
 if ~isfile(fullfile(pathstr, strcat(name, matext)))
     device = Device(path, DeviceType.IGBTwithoutDiode);
+    save(fullfile(pathstr, name), 'device');
+end
+% Infineon IGBT + Cree SiC Schottky Diode
+path = '.\devices\Infineon_IGZ100N65H5_650V_Diode_C5D50065D.xlsx';
+[pathstr, name, ~] = fileparts(path);
+if ~isfile(fullfile(pathstr, strcat(name, matext)))
+    device = Device(path, DeviceType.IGBT);
     save(fullfile(pathstr, name), 'device');
 end
 % Infineon CoolMOS
