@@ -28,7 +28,6 @@ position1 = a.Position;
 subplot(3, 1, 2); hold on;
 yyaxis left;
 plot(t, waves.OneCycleUpwm);
-a = gca;
 yyaxis right;
 plot(t, waves.Fundamental_Component(1).*sin(100.*pi.*t+waves.Fundamental_Component(2)));
 a = gca;
