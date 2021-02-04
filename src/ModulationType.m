@@ -5,5 +5,6 @@ classdef ModulationType
         TwoLevel_SVM
         ThreeLevel_ANPC_DualCurrentPath
         ThreeLevel_ANPC_SingleCurrentPath
+        ThreeLevel_ANPC_SVM
     end
 end

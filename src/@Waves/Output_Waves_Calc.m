@@ -2,6 +2,7 @@ function Output_Waves_Calc(obj, path, load, options)
 arguments
     obj, path, load
     options.Object (1, 1) string {mustBeMember(options.Object, {'Current', 'Voltage', 'Both'})} = 'Both'
+    options.Neutral (1, :) double = inf
 end
 
 if obj.Ready == 1
@@ -26,6 +27,9 @@ if obj.Ready == 1
             end
             obj.Upwm = obj.Upwm + path(i, end-1) .* logic;
         end
+    end
+    if length(options.Neutral) == length(obj.Upwm) && options.Neutral(1) ~= inf
+        obj.Upwm = obj.Upwm - options.Neutral;
     end
     % 状态空间方程计算一次还是需要一定的时间的, 因为损耗计算时只需要电流, 不需要电压波形
     % 因此这里多加了一个变量

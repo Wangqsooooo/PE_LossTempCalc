@@ -17,7 +17,8 @@ classdef TopologyType
                         || (modulationtype == ModulationType.TwoLevel_SVM);
                 case TopologyType.ThreeLevel_ANPC
                     flag = (modulationtype == ModulationType.ThreeLevel_ANPC_DualCurrentPath) ...
-                        || (modulationtype == ModulationType.ThreeLevel_ANPC_SingleCurrentPath);
+                        || (modulationtype == ModulationType.ThreeLevel_ANPC_SingleCurrentPath) ...
+                        || (modulationtype == ModulationType.ThreeLevel_ANPC_SVM);
                 otherwise
                     flag = 0;
             end
@@ -29,7 +30,8 @@ classdef TopologyType
                         ModulationType.TwoLevel_SVM]);
                 case TopologyType.ThreeLevel_ANPC
                     list = string([ModulationType.ThreeLevel_ANPC_DualCurrentPath; ...
-                        ModulationType.ThreeLevel_ANPC_SingleCurrentPath]);
+                        ModulationType.ThreeLevel_ANPC_SingleCurrentPath; ...
+                        ModulationType.ThreeLevel_ANPC_SVM]);
                 otherwise
                     disp('No Predefined Modulation Method!');
                     list = [];

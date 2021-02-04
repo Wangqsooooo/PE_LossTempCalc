@@ -101,7 +101,7 @@ classdef Load < handle
             if obj.PF == 1
                 A = -obj.R_load/obj.L;
                 B = 1/obj.L;
-                C = 1; D = 0;
+                C = 1; D = 0; 
             elseif obj.PF_flag == 1
                 A = [0 -1/obj.L; 1/obj.C_load -1/obj.R_load/obj.C_load];
                 B = [1/obj.L 0]';

@@ -58,6 +58,9 @@ classdef Waves < handle
                     case ModulationType.ThreeLevel_ANPC_SingleCurrentPath
                         disp('ThreeLevel ANPC Single-Current-Path Method is applied!');
                         obj.ThreeLevel_ANPC_SingleCurrentPath(load, options.PhaseShift, options.Order);
+                    case ModulationType.ThreeLevel_ANPC_SVM
+                        disp('ThreeLevel ANPC SVM Method is applied!')
+                        obj.ThreeLevel_ANPC_SVM(load, options.PhaseShift, options.Order);
                 end
             end
         end
@@ -91,7 +94,7 @@ classdef Waves < handle
             h = obj.Display(h, t_begin, t_end, modulation, carrier, control);
         end
         
-        % 三电平ANPC电路双电流通路调制方法
+        % 三电平ANPC拓扑双电流通路调制方法
         % 最后一个参数是这个调制方法中的暂态过程的持续时间transient, 默认为3e-6
         [modulation, carrier, control] = ThreeLevel_ANPC_DualCurrentPath(obj, load, phaseshift, order, transient, options);
         function [h, modulation, carrier, control] = ThreeLevel_ANPC_DualCurrentPath_Display(obj, h, t_begin, t_end, load, options)
@@ -104,7 +107,7 @@ classdef Waves < handle
             [modulation, carrier, control] = obj.ThreeLevel_ANPC_DualCurrentPath(load, options.PhaseShift, 'DisplayMode', 'Yes');
             h = obj.Display(h, t_begin, t_end, modulation, carrier, control);
         end
-        % 三电平ANPC电路单电流通路调制方法
+        % 三电平ANPC拓扑单电流通路调制方法
         [modulation, carrier, control] = ThreeLevel_ANPC_SingleCurrentPath(obj, load, phaseshift, order, options);
         function [h, modulation, carrier, control] = ThreeLevel_ANPC_SingleCurrentPath_Display(obj, h, t_begin, t_end, load, options)
             arguments
@@ -114,6 +117,18 @@ classdef Waves < handle
                 options.PhaseShift (1, 1) double = 0 % 调制波的相移角
             end
             [modulation, carrier, control] = obj.ThreeLevel_ANPC_SingleCurrentPath(load, options.PhaseShift, 'DisplayMode', 'Yes');
+            h = obj.Display(h, t_begin, t_end, modulation, carrier, control);
+        end
+        % 混合三电平ANPC拓扑SVM调制策略
+        [modulation, carrier, control] = ThreeLevel_ANPC_SVM(obj, load, phaseshift, order, options);
+        function [h, modulation, carrier, control] = ThreeLevel_ANPC_SVM_Display(obj, h, t_begin, t_end, load, options)
+            arguments
+                obj, h
+                t_begin (1, 1) double, t_end (1, 1) double
+                load Load
+                options.PhaseShift (1, 1) double = 0 % 调制波的相移角
+            end
+            [modulation, carrier, control] = obj.ThreeLevel_ANPC_SVM(load, options.PhaseShift, 'DisplayMode', 'Yes');
             h = obj.Display(h, t_begin, t_end, modulation, carrier, control);
         end
         

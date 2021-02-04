@@ -17,7 +17,9 @@ carrier(1, :) = (rem(t.*load.freq, 1)<1/2) .* (1-2.*rem(t.*load.freq, 1)) ...
     + (rem(t.*load.freq, 1)>=1/2) .* (-1+2.*rem(t.*load.freq, 1));
 carrier(2, :) = carrier(1, :) - 1;
 control = zeros(6, length(t));
-% 小数点后10位精度
+% 为了区别 modulation == 0 的情况
+% 直接用 modulation >= 0 来判断会使正半周期大于负半周期
+% 精确到小数点后10位
 control(1, :) = (modulation >= 1e-10) ...
     | (modulation<1e-10 & modulation>-1e-10 & shift_modulation<-1e-10);
 control(4, :) = ~control(1, :);

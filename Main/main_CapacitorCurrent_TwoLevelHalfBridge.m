@@ -25,6 +25,11 @@ waves_phaseC.Output_Waves_Calc(topology.Path, cload);
 current_phaseC = waves_phaseC.Device_FlowingCurrent_Calc(1, topology.Path, 'Mode', 'Fundamental');
 current_phaseC = current_phaseC(round((Period-T)/Ts+1):round(Period/Ts+1));
 
-h = figure(1);
-clf(h, 'reset');
+h = figure(1); clf(h, 'reset');
 plot(0:Ts:T, current_phaseA+current_phaseB+current_phaseC);
+h = figure(2); clf(h, 'reset');
+Cap_current = current_phaseA+current_phaseB+current_phaseC - ...
+    mean(current_phaseA+current_phaseB+current_phaseC);
+C = 500e-6;
+Cap_voltage = cumsum(Cap_current ./ C .* Ts);
+plot(0:Ts:T, Cap_voltage);
