@@ -17,6 +17,7 @@ classdef Losses < handle
         Devices
         Parallel_Nums
         Switching_Voltage
+        Rg % 驱动电阻
         Theatsink % 散热器温度
         Tcase % 壳温
         Tj % 结温
@@ -41,14 +42,15 @@ classdef Losses < handle
     end
     
     methods
-        function obj = Losses(T, Ts, current, control, path, devices, parallel_nums, switching_voltage, device_inparallel)
-            if nargin >= 8
+        function obj = Losses(T, Ts, current, control, path, devices, parallel_nums, switching_voltage, Rg, device_inparallel)
+            if nargin >= 9
                 obj.T = T; obj.Ts = Ts;
                 obj.Current = current';
                 obj.Control = control;
                 obj.Devices = devices;
                 obj.Parallel_Nums = parallel_nums;
                 obj.Switching_Voltage = switching_voltage;
+                obj.Rg = Rg;
                 % 结温初始化
                 obj.Tj = cell(size(obj.Control, 1), 1);
                 obj.JunctionTemperatureSet(obj.Init_JunctionTemperature);
@@ -64,7 +66,7 @@ classdef Losses < handle
                 if length(position) == size(path, 1)
                     obj.Path = path;
                 else
-                    if nargin == 9
+                    if nargin == 10
                         obj.Device_InParallel = device_inparallel;
                     else
                         error('Please enter one more input named ''device_inparallel''!');

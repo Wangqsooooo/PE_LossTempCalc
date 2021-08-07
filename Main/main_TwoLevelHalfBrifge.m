@@ -12,7 +12,8 @@ SiC_MOSFET = load('.\devices\Cree_C3M0015065K_SiC_650V.mat');
 devices = [SiC_MOSFET.device SiC_MOSFET.device];
 parallel_nums = [2 2]; % 器件并联个数
 Switching_Voltage = [Vdc Vdc];
+Rg = [5, 5; 5, 5];
 losses = Losses(waves.T, waves.Ts, waves.OneCycleCurrent, waves.OneCycleControl, ...
-    topology.Path, devices, parallel_nums, Switching_Voltage);
+    topology.Path, devices, parallel_nums, Switching_Voltage, Rg);
 losses.Conduction_Losses_Calc();
 losses.Switching_Losses_Calc();

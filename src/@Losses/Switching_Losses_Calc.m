@@ -96,7 +96,7 @@ for i = 1:size(path, 1)
                             end
                         end
                         E = obj.Devices(position).Switching_Loss('Switch_Eon', current, ...
-                            'V', obj.Switching_Voltage(position), 'Tj', obj.Tj{position}(1));
+                            'V', obj.Switching_Voltage(position), 'Tj', obj.Tj{position}(1), 'Rg', obj.Rg(position, 1));
                         obj.Switch_Eon(position, Intersect) = E;
                     end
                 end
@@ -121,7 +121,7 @@ for i = 1:size(path, 1)
                             end
                         end
                         E = obj.Devices(position).Switching_Loss('Switch_Eoff', current, ...
-                            'V', obj.Switching_Voltage(position), 'Tj', obj.Tj{position}(1));
+                            'V', obj.Switching_Voltage(position), 'Tj', obj.Tj{position}(1), 'Rg', obj.Rg(position, 2));
                         obj.Switch_Eoff(position, Intersect) = E;
                         if obj.Devices(position).Type == DeviceType.IGBT
                             E = obj.Devices(position).Recovery_Loss(current, obj.Switching_Voltage(position), ...

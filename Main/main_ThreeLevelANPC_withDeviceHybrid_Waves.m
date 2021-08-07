@@ -31,8 +31,9 @@ devices = [Si_IGBT.device SiC_MOSFET.device SiC_MOSFET.device Si_IGBT.device ...
     Si_IGBT.device Si_IGBT.device Si_IGBT.device Si_IGBT.device];
 parallel_nums = [3 3 3 3 3 3 3 3]; % 3 .* ones(1, topology.Nums); % 器件并联个数
 Switching_Voltage = Vdc./2 .* ones(1, topology.Nums);
+Rg = [4, 23; 5, 5; 5, 5; 4, 23; 4, 23; 4, 23];
 losses = Losses(waves.T, waves.Ts, waves.OneCycleCurrent, waves.OneCycleControl, ...
-    topology.Path, devices, parallel_nums, Switching_Voltage, topology.Device_InParallel);
+    topology.Path, devices, parallel_nums, Switching_Voltage, Rg, topology.Device_InParallel);
 % 计算开关管上的电流
 % 由于存在器件层面的混合, 只有在明确了具体的器件以及具体的结温后才能计算开关管上的电流
 losses.JunctionTemperatureSet(85);

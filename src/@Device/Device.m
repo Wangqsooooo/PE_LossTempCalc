@@ -127,8 +127,14 @@ classdef Device < handle
                         E = E .* (value./obj.Switching.(strcat(i{1}, 'base'))) ...
                             .^obj.Switching.(state){strcmp('V', i{1})*3+strcmp('Tj', i{1})*4+strcmp('Rg', i{1})*5};
                     else
+                        base = obj.Switching.(strcat(i{1}, 'base'));
+                        if strcmp(i{1}, 'Rg') && strcmp(state, 'Switch_Eon')
+                            base = base(1);
+                        elseif strcmp(i{1}, 'Rg') && strcmp(state, 'Switch_Eoff')
+                            base = base(2);
+                        end
                         E = E .* polyval(obj.Switching.(state){strcmp('V', i{1})*3+strcmp('Tj', i{1})*4+strcmp('Rg', i{1})*5}, ...
-                            value./obj.Switching.(strcat(i{1}, 'base')));
+                            value./base);
                     end
                 end
                 E = E .* polyval(obj.Switching.(state){2}, p.Results.current) .* (p.Results.current>=0);
@@ -235,8 +241,14 @@ classdef Device < handle
                         Loss = Loss * (record(i)/obj.Switching.(strcat(name{i}, 'base'))) ...
                             ^ obj.Switching.(state){strcmp('V', name{i})*3+strcmp('Tj', name{i})*4+strcmp('Rg', name{i})*5};
                     else
+                        base = obj.Switching.(strcat(i{1}, 'base'));
+                        if strcmp(state, 'Switch_Eon')
+                            base = base(1);
+                        elseif strcmp(state, 'Switch_Eoff')
+                            base = base(2);
+                        end
                         Loss = Loss * polyval(obj.Switching.(state){strcmp('V', name{i})*3+strcmp('Tj', name{i})*4+strcmp('Rg', name{i})*5}, ...
-                            record(i)/obj.Switching.(strcat(name{i}, 'base')));
+                            record(i)/base);
                     end
                 end
                 Loss = Loss .* polyval(obj.Switching.(state){2}, current) .* (current>=0);

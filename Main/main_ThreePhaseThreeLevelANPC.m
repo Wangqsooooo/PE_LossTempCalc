@@ -26,12 +26,13 @@ Si_IGBT.device.Zthch = {[0.197000000000000 0.01]};
 devices = [Si_IGBT.device SiC_MOSFET.device SiC_MOSFET.device Si_IGBT.device Si_IGBT.device Si_IGBT.device];
 parallel_nums = 3 .* ones(1, topology.Nums); % 器件并联个数
 Switching_Voltage = Vdc./2 .* ones(1, topology.Nums);
+Rg = [4, 23; 5, 5; 5, 5; 4, 23; 4, 23; 4, 23];
 losses_phaseA = Losses(waves_phaseA.T, waves_phaseA.Ts, waves_phaseA.OneCycleCurrent, waves_phaseA.OneCycleControl, ...
-    topology.Path, devices, parallel_nums, Switching_Voltage);
+    topology.Path, devices, parallel_nums, Switching_Voltage, Rg);
 losses_phaseB = Losses(waves_phaseB.T, waves_phaseB.Ts, waves_phaseB.OneCycleCurrent, waves_phaseB.OneCycleControl, ...
-    topology.Path, devices, parallel_nums, Switching_Voltage);
+    topology.Path, devices, parallel_nums, Switching_Voltage, Rg);
 losses_phaseC = Losses(waves_phaseC.T, waves_phaseC.Ts, waves_phaseC.OneCycleCurrent, waves_phaseC.OneCycleControl, ...
-    topology.Path, devices, parallel_nums, Switching_Voltage);
+    topology.Path, devices, parallel_nums, Switching_Voltage, Rg);
 Zthha = {[0.1, 0.01]};
 tic
 losses_phaseA.Temperature_Losses_Calc(Zthha, 'ThreePhase', 'CalcMode', 'RealTime', 'PhaseB', losses_phaseB, 'PhaseC', losses_phaseC);

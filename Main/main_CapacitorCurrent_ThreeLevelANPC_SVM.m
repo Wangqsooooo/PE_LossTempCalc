@@ -1,16 +1,13 @@
 filename = 'ThreeLevel_ANPC.txt';
 topology = Topology('Filename', filename);
-% Vdc = topology.Path(end, end-1)-topology.Path(1, end-1); % Vdc等于逆变器输出侧最高直流电压减去最低直流电压
-Vdc = 800;
-cload = Load(Vdc, 30000, 0.02, 1e-3, 400, 100e3, 100, 1, 'PF', 0.9524); % load是matlab的关键词, 换成cload
+Vdc = topology.Path(end, end-1)-topology.Path(1, end-1); % Vdc等于逆变器输出侧最高直流电压减去最低直流电压
+cload = Load(Vdc, 30000, 0.02, 140e-6, 400, 100e3, 100, 1, 'PF', 1); % load是matlab的关键词, 换成cload
 waves_phaseA = Waves(cload, topology.Nums, 0.06, 'Topology', topology.Type, 'Order', topology.Order, ...
     'PhaseShift', 0, 'Defined_Modulation', ModulationType.ThreeLevel_ANPC_SVM);
 % h = figure(4);
 % [h, modulation, carrier, control] = waves.ThreeLevel_ANPC_SVM_Display(h, 0, 0.06, cload);
 waves_phaseA.ShortCircuit_Check(topology.HB_Restriction);
 waves_phaseA.Output_Waves_Calc(topology.Path, cload);
-% g = figure(5);
-% g = waves.Output_Waves_Display(g);
 
 waves_phaseB = Waves(cload, topology.Nums, 0.06, 'Topology', topology.Type, 'Order', topology.Order, ...
     'PhaseShift', 2*pi/3, 'Defined_Modulation', ModulationType.ThreeLevel_ANPC_SVM);
@@ -26,18 +23,22 @@ NeutralPoint_Voltage = (waves_phaseA.Upwm + waves_phaseB.Upwm + waves_phaseC.Upw
 waves_phaseA.Output_Waves_Calc(topology.Path, cload, 'Neutral', NeutralPoint_Voltage);
 waves_phaseB.Output_Waves_Calc(topology.Path, cload, 'Neutral', NeutralPoint_Voltage);
 waves_phaseC.Output_Waves_Calc(topology.Path, cload, 'Neutral', NeutralPoint_Voltage);
+% 输出波形显示
+g = figure(1);
+g = waves_phaseA.Output_Waves_Display(g);
 
 SiC_MOSFET = load('.\devices\Cree_C3M0015065K_SiC_650V.mat');
 Si_IGBT = load('.\devices\Infineon_IKZ75N65EL5_650V_withoutRecovery.mat');
 devices = [Si_IGBT.device SiC_MOSFET.device SiC_MOSFET.device Si_IGBT.device Si_IGBT.device Si_IGBT.device];
 parallel_nums = [3 6 6 3 3 3];
 Switching_Voltage = Vdc./2 .* ones(1, topology.Nums);
+Rg = [4, 23; 5, 5; 5, 5; 4, 23; 4, 23; 4, 23];
 losses = Losses(waves_phaseA.T, waves_phaseA.Ts, waves_phaseA.OneCycleCurrent, waves_phaseA.OneCycleControl, ...
-    topology.Path, devices, parallel_nums, Switching_Voltage);
-% losses.Temperature_Losses_Calc(0.1);
-losses.JunctionTemperatureSet(85);
-losses.Conduction_Losses_Calc();
-losses.Switching_Losses_Calc();
+    topology.Path, devices, parallel_nums, Switching_Voltage, Rg);
+losses.Temperature_Losses_Calc(0.04);
+% losses.JunctionTemperatureSet(85);
+% losses.Conduction_Losses_Calc();
+% losses.Switching_Losses_Calc();
  
 % Period = waves_phaseA.Period; T = waves_phaseA.T; Ts = waves_phaseA.Ts;
 % current_phaseA = waves_phaseA.Device_FlowingCurrent_Calc(1, topology.Path, 'Mode', 'Fundamental');

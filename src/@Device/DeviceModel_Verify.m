@@ -146,8 +146,8 @@ end
 function result = Plot(img, x, y)
 l = length(x);
 for i=1:l
-    for j=x(i)-5:x(i)+5
-        for k=y(i)-7:y(i)+7
+    for j=x(i)-2:x(i)+2
+        for k=y(i)-2:y(i)+2
             img(k, j, :) = [255 0 0];
         end
     end

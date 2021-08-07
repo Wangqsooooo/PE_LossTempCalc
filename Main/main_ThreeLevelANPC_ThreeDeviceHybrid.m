@@ -5,6 +5,9 @@
 filename = 'ThreeLevel_ANPC_ThreeDeviceHybrid.txt';
 topology = Topology('Filename', filename);
 Vdc = topology.Path(end, end-1)-topology.Path(1, end-1); % Vdc等于逆变器输出侧最高直流电压减去最低直流电压
+% Load类输入参数说明:
+% 第一个参数：直流母线；第二个参数：开关频率；第三个频率：基波周期；
+% 第四个以及之后的参数为与负载相关的参数
 cload = Load(Vdc, 4000, 0.02, 1e-3, 400, 100e3, 100, 1, 'PF', 0.9524); % load是matlab的关键词, 换成cload
 waves = Waves(cload, topology.Nums, 0.06);
 waves.ThreeLevel_ANPC_SingleCurrentPath(cload, 0, [1 2 3 4 5 6]);
@@ -37,10 +40,11 @@ devices = [Si_IGBT.device SiC_MOSFET.device SiC_MOSFET.device Si_IGBT.device ...
     Si_IGBT_parallel.device Si_IGBT_parallelD.device];
 parallel_nums = [3 2 2 3 3 3 3 1 3 1]; % 3 .* ones(1, topology.Nums); % 器件并联个数
 Switching_Voltage = Vdc./2 .* ones(1, topology.Nums);
+Rg = [4, 23; 5, 5; 5, 5; 4, 23; 4, 23; 4, 23];
 losses = Losses(waves.T, waves.Ts, waves.OneCycleCurrent, waves.OneCycleControl, ...
-    topology.Path, devices, parallel_nums, Switching_Voltage, topology.Device_InParallel);
-% losses.Temperature_Losses_Calc(0.07);
-losses.JunctionTemperatureSet(85);
+    topology.Path, devices, parallel_nums, Switching_Voltage, Rg, topology.Device_InParallel);
+% losses.Temperature_Losses_Calc(0.07); % 根据散热器热阻对器件结温和损耗进行计算
+losses.JunctionTemperatureSet(85); % 固定器件结温进行器件损耗计算
 losses.Conduction_Losses_Calc();
 losses.Switching_Losses_Calc();
 % Display
