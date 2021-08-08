@@ -1,5 +1,5 @@
 function Topology_Explanation(obj)
-data = importdata(obj.Filename);
+data = obj.RawData;
 % 搜索拓扑中所有具有电压支撑的半桥结构
 s = str2double(data.textdata(1:end-1, 1))';
 t = str2double(data.textdata(1:end-1, 2))';

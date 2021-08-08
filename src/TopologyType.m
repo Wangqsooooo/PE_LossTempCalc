@@ -37,13 +37,15 @@ classdef TopologyType
                     list = [];
             end
         end
-        function [path, order] = DefinedTopologyPathAndOrder(obj)
+        function [data, order] = DefinedTopologyPathAndOrder(obj)
             switch obj
                 case TopologyType.TwoLevel_HalfBridge
                     path = 'material\text\TwoLevel_HalfBridge.txt';
+                    data = importdata(path);
                     order = 1:2;
                 case TopologyType.ThreeLevel_ANPC
                     path = 'material\text\ThreeLevel_ANPC.txt';
+                    data = importdata(path);
                     order = 1:6;
                 otherwise
                     error('Unknown topology!');

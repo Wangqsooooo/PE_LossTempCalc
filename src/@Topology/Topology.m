@@ -4,7 +4,7 @@ classdef Topology < handle
         HB_G_split = graph([1 1 2 3], [2 4 3 4]); % 也是半桥结构图, 电压裂变为两个串联, 这样可以多出一个零电压节点
     end
     properties(SetAccess = private, GetAccess = public)
-        Filename % 输入文件的地址
+        RawData % 输入文件的地址
         HB_Restriction % 半桥结构限制
                        % 储存组成半桥结构且有电压支撑的两个管子的序号, 组成半桥结构的两个管子不能直通
         Path % 电流通路矩阵
@@ -18,14 +18,20 @@ classdef Topology < handle
     methods
         function obj = Topology(options)
             arguments
+                options.Data struct = struct([])
                 options.Filename (1, 1) string = 'TwoLevel_HalfBridge.txt'
                 options.Topology TopologyType = TopologyType.Unknown
             end
             
             if options.Topology == TopologyType.Unknown
-                obj.Filename = options.Filename;
                 % 判断拓扑是否是已定义的拓扑, 即TopologyType中的一种
-                data = importdata(obj.Filename);
+                if isempty(options.Data)
+                    obj.RawData = importdata(obj.Filename);
+                    data = obj.RawData;
+                else
+                    obj.RawData = options.Data;
+                    data = obj.RawData;
+                end
                 s = str2double(data.textdata(1:end-1, 1))';
                 t = str2double(data.textdata(1:end-1, 2))';
                 type = cell2mat(data.textdata(1:end-1, 3))';
@@ -49,12 +55,13 @@ classdef Topology < handle
                     end
                 end
             else
-                [obj.Filename, obj.Order] = options.Topology.DefinedTopologyPathAndOrder();
+                [obj.RawData, obj.Order] = options.Topology.DefinedTopologyPathAndOrder();
                 obj.Type = options.Topology;
             end
             obj.Topology_Explanation(); % 求出 HB_Restriction、Path
                                         % 顺便给出 Nums
         end
+        
         Topology_Explanation(obj);
     end
 end
