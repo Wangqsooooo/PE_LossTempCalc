@@ -26,7 +26,7 @@ classdef Topology < handle
             if options.Topology == TopologyType.Unknown
                 % 判断拓扑是否是已定义的拓扑, 即TopologyType中的一种
                 if isempty(options.Data)
-                    obj.RawData = importdata(obj.Filename);
+                    obj.RawData = importdata(options.Filename);
                     data = obj.RawData;
                 else
                     obj.RawData = options.Data;

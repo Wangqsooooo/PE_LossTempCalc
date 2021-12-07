@@ -10,8 +10,8 @@ waves = Waves(cload, topology.Nums, 0.06, 'Topology', topology.Type, 'Order', to
     'Defined_Modulation', ModulationType.ThreeLevel_ANPC_SingleCurrentPath);
 waves.ShortCircuit_Check(topology.HB_Restriction);
 waves.Output_Waves_Calc(topology.Path, cload);
-% h = figure(1);
-% h = waves.Output_Waves_Display(h);
+h = figure(6);
+h = waves.Output_Waves_Display(h);
 SiC_MOSFET = load('.\devices\Cree_C3M0015065K_SiC_650V.mat');
 Si_IGBT = load('.\devices\Infineon_IKZ75N65EL5_650V_withoutRecovery.mat');
 devices = [Si_IGBT.device SiC_MOSFET.device SiC_MOSFET.device Si_IGBT.device Si_IGBT.device Si_IGBT.device];

@@ -39,4 +39,5 @@ losses_phaseA.Temperature_Losses_Calc(Zthha, 'ThreePhase', 'CalcMode', 'RealTime
 toc
 % 绘制出半导体器件的结温波动
 t = 0:losses_phaseA.Ts:(size(losses_phaseA.Tj_Dynamic(1, :),2)-1)*losses_phaseA.Ts;
+figure(3);
 plot(t, losses_phaseA.Tj_Dynamic(1, :));

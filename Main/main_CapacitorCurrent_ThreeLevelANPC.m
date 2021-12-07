@@ -1,7 +1,7 @@
 filename = 'ThreeLevel_ANPC.txt';
 topology = Topology('Filename', filename);
 Vdc = topology.Path(end, end-1)-topology.Path(1, end-1); % Vdc等于逆变器输出侧最高直流电压减去最低直流电压
-cload = Load(Vdc, 30000, 0.02, 1e-3, 400, 100e3, 100, 1, 'PF', 0.9524); % load是matlab的关键词, 换成cload
+cload = Load(Vdc, 30000, 0.002, 100e-6, 400, 100e3, 100, 1, 'PF', 0.9524); % load是matlab的关键词, 换成cload
 % phase A
 waves_phaseA = Waves(cload, topology.Nums, 0.06, 'Topology', topology.Type, 'Order', topology.Order, ...
     'PhaseShift', 0, 'Defined_Modulation', ModulationType.ThreeLevel_ANPC_SingleCurrentPath);

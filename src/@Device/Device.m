@@ -4,11 +4,14 @@ classdef Device < handle
         Type
         Fittype
         Conduction
-        Switching
         Recovery
         Rthch
         Rthjc
         RDthjc % 特指IGBT反并联二极管的热阻
+    end
+    properties(SetAccess = public, GetAccess = public)
+        Switching % 某些特殊情况需要从外部对其进行修改
+                         % 主要是器件模型仍然有问题, 没有办法找到一个通用的
     end
     % 如果热阻网络参数提取失败, 可以自己进行拟合然后手动设置Zthjc和ZDthjc
     properties
@@ -150,6 +153,7 @@ classdef Device < handle
                 E = zeros(1, length(current));
             end
         end
+
     end
     
     methods(Access=private)
